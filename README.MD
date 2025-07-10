@@ -109,4 +109,4 @@ A Postman/Insomnia HAR collection is provided at `vote-requests.har` in the proj
 
 ## Database Dump
 
-A SQL dump of the site database is provided at the root as `dump.sql` for easier setup if needed.
+A SQL dump of the site database is provided at the root as `dump.sql.zip` for easier setup if needed.
