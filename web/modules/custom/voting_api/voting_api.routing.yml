@@ -1,0 +1,19 @@
+voting_api.settings:
+  path: '/admin/config/voting-api/settings'
+  defaults:
+    _form: 'Drupal\voting_api\Form\SettingsForm'
+    _title: 'Voting API settings'
+  requirements:
+    _permission: 'administer site configuration'
+  options:
+    _admin_route: TRUE
+
+entity.poll_question.collection:
+  path: '/admin/content/poll_question'
+  defaults:
+    _entity_list: 'poll_question'
+    _title: 'Poll questions'
+  requirements:
+    _permission: 'view poll_question entities'
+  options:
+    _admin_route: TRUE

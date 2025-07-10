@@ -1,0 +1,7 @@
+name: 'Voting API'
+type: module
+description: 'Custom polling system with JSON:API integration.'
+core_version_requirement: ^11
+package: Custom
+dependencies:
+  - drupal:jsonapi

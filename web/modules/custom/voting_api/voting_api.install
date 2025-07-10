@@ -1,0 +1,57 @@
+<?php
+
+/**
+ * @file
+ * Install file for Voting API.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function voting_api_schema() {
+  $schema['poll_question'] = [
+    'description' => 'Table of poll questions.',
+    'fields' => [
+      'id' => ['type' => 'serial', 'not null' => TRUE],
+      'uuid' => ['type' => 'varchar', 'length' => 128, 'not null' => TRUE],
+      'title' => ['type' => 'varchar', 'length' => 255, 'not null' => TRUE],
+      'show_results' => ['type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => 1],
+      'total_votes'        => [
+        'type'     => 'int',
+        'not null' => TRUE,
+        'default'  => 0,
+      ],
+      'option_counts'      => [
+        'type'     => 'text',
+        'size'     => 'big',
+        'not null' => TRUE,
+        'default'  => '',
+      ],
+      'option_percentages' => [
+        'type'     => 'text',
+        'size'     => 'big',
+        'not null' => TRUE,
+        'default'  => '',
+      ],
+    ],
+    'primary key' => ['id'],
+    'unique keys' => ['uuid' => ['uuid']],
+  ];
+
+  $schema['poll_vote'] = [
+    'description' => 'Table of poll vote records.',
+    'fields' => [
+      'id'          => ['type' => 'serial',  'not null' => TRUE],
+      'uuid'        => ['type' => 'varchar', 'length' => 36,     'not null' => TRUE],
+      'question_id' => ['type' => 'int',     'not null' => TRUE],
+      'option_uuid' => ['type' => 'varchar', 'length' => 36,     'not null' => TRUE],
+      'created'     => ['type' => 'int',     'not null' => TRUE],
+    ],
+    'primary key'   => ['id'],
+    'unique keys'   => [
+      'uuid' => ['uuid'],
+    ],
+  ];
+
+  return $schema;
+}

@@ -1,0 +1,8 @@
+voting_api.add_poll_question:
+  route_name: entity.poll_question.add_form
+  title: 'Add poll question'
+  appears_on:
+    - entity.poll_question.collection
+  options:
+    query:
+      destination: '/admin/content/poll_question'

@@ -1,0 +1,23 @@
+{#
+/**
+ * @file
+ * Theme template for Poll Question stats list builder.
+ *
+ * Variables:
+ * - items: An array of items, each with:
+ *   - name: The option label.
+ *   - percent: The vote percentage (integer).
+ */
+#}
+<div class="poll-gauge-list">
+	{% if items %}
+		{% for item in items %}
+			<div class="poll-gauge-item">
+				<progress max="100" value="{{ item.percent }}"></progress>
+			<span class="poll-gauge-label">{{ item.name }}
+				({{ item.percent }}%)</span>
+		</div>
+	{% endfor %}
+{% else %}
+	<div class="poll-gauge-empty">—</div>
+{% endif %}</div>

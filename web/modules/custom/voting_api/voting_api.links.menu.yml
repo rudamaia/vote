@@ -1,0 +1,6 @@
+voting_api.settings:
+  title: 'Voting settings'
+  description: 'Configure global settings for the voting system.'
+  route_name: voting_api.settings
+  parent: system.admin_config_system
+  weight: 100

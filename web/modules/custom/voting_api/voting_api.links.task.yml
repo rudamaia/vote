@@ -1,0 +1,12 @@
+# Main admin tab under Content for Voting.
+voting_api.admin:
+  title: 'Voting'
+  route_name: entity.poll_question.collection
+  base_route: system.admin_content
+
+# Sub-tabs under the Voting admin tab.
+voting_api.poll_question_tab:
+  title: 'Poll questions'
+  route_name: entity.poll_question.collection
+  parent_id: voting_api.admin
+  weight: 0

@@ -1,0 +1,64 @@
+<?php
+
+use Drupal\Core\Database\Database;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\voting_api\Entity\PollQuestion;
+
+/**
+ * Implements hook_ENTITY_TYPE_insert() for poll_vote.
+ */
+function voting_api_poll_vote_insert(EntityInterface $vote) {
+  if ($question = $vote->get('question_id')->entity) {
+    _voting_api_update_question_stats($question);
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_delete() for poll_vote.
+ */
+function voting_api_poll_vote_delete(EntityInterface $vote) {
+  if ($question = $vote->get('question_id')->entity) {
+    _voting_api_update_question_stats($question);
+  }
+}
+
+/**
+ * Helper: Recalculate and store vote statistics for a question.
+ *
+ * @param \Drupal\voting_api\Entity\PollQuestion $question
+ *   The question entity to update.
+ */
+function _voting_api_update_question_stats(PollQuestion $question) {
+  // Load all vote entities for this question.
+  $storage = \Drupal::entityTypeManager()->getStorage('poll_vote');
+  $votes = $storage->loadByProperties(['question_id' => $question->id()]);
+
+  // Tally vote counts per option UUID.
+  $results = [];
+  foreach ($votes as $vote) {
+    $uuid = $vote->option_uuid->value;
+    $results[$uuid] = ($results[$uuid] ?? 0) + 1;
+  }
+  // Ensure zero counts for any missing options.
+  foreach ($question->get('options') as $item) {
+    $uuid = $item->uuid;
+    if (!isset($results[$uuid])) {
+      $results[$uuid] = 0;
+    }
+  }
+
+  // Compute total votes.
+  $total = array_sum($results);
+
+  // Compute percentages.
+  $percentages = [];
+  foreach ($results as $uuid => $count) {
+    $percentages[$uuid] = $total ? round(($count / $total) * 100, 1) : 0;
+  }
+
+  // Store stats on the question entity.
+  $question->set('total_votes', $total);
+  $question->set('option_counts', json_encode($results));
+  $question->set('option_percentages', json_encode($percentages));
+  $question->save();
+}

@@ -1,0 +1,27 @@
+create poll_question entities:
+  title: 'Create Poll Questions'
+  description: 'Allow creating new PollQuestion entities.'
+
+view poll_question entities:
+  title: 'View Poll Questions'
+  description: 'Allow viewing PollQuestion entities.'
+
+update poll_question entities:
+  title: 'Edit Poll Questions'
+  description: 'Allow editing PollQuestion entities.'
+
+delete poll_question entities:
+  title: 'Delete Poll Questions'
+  description: 'Allow deleting PollQuestion entities.'
+
+create poll_vote entities:
+  title: 'Submit Votes'
+  description: 'Allow creating new PollVote entities (voting).'
+
+view poll_vote entities:
+  title: 'View Votes'
+  description: 'Allow viewing PollVote entities (results).'
+
+delete poll_vote entities:
+  title: 'Delete Poll Votes'
+  description: 'Allow deleting PollVote entities.'
