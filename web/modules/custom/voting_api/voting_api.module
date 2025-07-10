@@ -1,6 +1,5 @@
 <?php
 
-use Drupal\Core\Database\Database;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\voting_api\Entity\PollQuestion;
 
@@ -19,6 +18,18 @@ function voting_api_poll_vote_insert(EntityInterface $vote) {
 function voting_api_poll_vote_delete(EntityInterface $vote) {
   if ($question = $vote->get('question_id')->entity) {
     _voting_api_update_question_stats($question);
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_delete() for poll_question.
+ */
+function voting_api_poll_question_delete(\Drupal\Core\Entity\EntityInterface $question) {
+  // Load and delete all votes associated with this question.
+  $storage = \Drupal::entityTypeManager()->getStorage('poll_vote');
+  $votes = $storage->loadByProperties(['question_id' => $question->id()]);
+  foreach ($votes as $vote) {
+    $vote->delete();
   }
 }
 
@@ -61,4 +72,19 @@ function _voting_api_update_question_stats(PollQuestion $question) {
   $question->set('option_counts', json_encode($results));
   $question->set('option_percentages', json_encode($percentages));
   $question->save();
+}
+
+/**
+ * Implements hook_entity_presave().
+ *
+ * Ensures each option item in a PollQuestion has a UUID when saving.
+ */
+function voting_api_entity_presave(EntityInterface $entity) {
+  if ($entity->getEntityTypeId() === 'poll_question') {
+    foreach ($entity->get('options') as $delta => $item) {
+      if (empty($item->uuid)) {
+        $entity->get('options')[$delta]->uuid = \Drupal::service('uuid')->generate();
+      }
+    }
+  }
 }
