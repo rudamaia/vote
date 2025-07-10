@@ -1,0 +1,32 @@
+uuid: 92048532-ee13-4560-8de4-abfec1ea90bb
+langcode: en
+status: true
+dependencies:
+  config:
+    - filter.format.restricted_html
+  module:
+    - comment
+    - contact
+    - filter
+    - search
+    - system
+    - voting_api
+_core:
+  default_config_hash: 6WavjUYXIegP9AAg2zXGx54MWIVoomC3SZhNiqe-Dyk
+id: anonymous
+label: 'Anonymous user'
+weight: 0
+is_admin: false
+permissions:
+  - 'access comments'
+  - 'access content'
+  - 'access site-wide contact form'
+  - 'create poll_question entities'
+  - 'create poll_vote entities'
+  - 'delete poll_question entities'
+  - 'delete poll_vote entities'
+  - 'search content'
+  - 'update poll_question entities'
+  - 'use text format restricted_html'
+  - 'view poll_question entities'
+  - 'view poll_vote entities'
