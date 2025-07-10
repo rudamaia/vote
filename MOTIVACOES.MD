@@ -33,6 +33,9 @@
    - A listagem canônica de perguntas (`/admin/content/poll_question`) é gerada automaticamente pelo Drupal a partir de um ListBuilder personalizado.
    - A classe `PollQuestionListBuilder` estende `EntityListBuilder`, usando `buildHeader()` para colunas e `buildRow()` para preencher título, total de votos, barras de progresso e links de operação.
    - Essa abordagem declarativa garante consistência com outras listagens do Drupal e facilita futuras customizações.
+7. **Remoção em Cascata de Votos**
+   - Ao excluir uma `PollQuestion`, um hook de remoção (`hook_entity_delete`) apaga automaticamente todos os `poll_vote` associados.
+   - Isso assegura integridade referencial e evita registros órfãos no banco de dados.
 
 ## 3. Inconsistências na Documentação Técnica do Teste
 Embora o documento apresente o escopo geral do sistema de votação, alguns requisitos não especificam claramente o contexto de aplicação — se referem à interface administrativa, à visualização de conteúdo pelos usuários finais ou aos consumidores de API. Do mesmo modo, as orientações sobre configurações de funcionamento, permissões e operações externas ficam em termos amplos, exigindo suposições que podem levar a diferentes interpretações. Para garantir um comportamento previsível e alinhado às boas práticas do Drupal, optei por decisões arquiteturais e tecnológicas que preenchem essas lacunas de forma estruturada e padronizada.

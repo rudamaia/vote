@@ -13,7 +13,7 @@ Follow these steps to install and run the project locally:
 
 1. **Clone the repository**  
    ```bash
-   git clone <repository-url> vote
+   git clone https://github.com/rudamaia/vote.git
    cd vote
    ```
 
@@ -23,11 +23,8 @@ Follow these steps to install and run the project locally:
    ```
 
 3. **Set up Drupal settings and install the site**  
-   - If you dont want to use Drush, you can always manually set `settings.php`:
-     ```bash
-     cp web/sites/default/default.settings.php web/sites/default/settings.php
-     chmod 664 web/sites/default/settings.php
-     ```  
+   - If you dont want to use Drush, you can always manually set DB credentials creating a `web/sites/default/settings.local.php` alongside the standard versioned `settings.php`:
+ 
    - **Install via Drush** (recommended):
      ```bash
      drush site:install standard \
@@ -38,10 +35,24 @@ Follow these steps to install and run the project locally:
 ## Configuration Management
 
 - Active configuration is stored in `config/sync`.  
-- To import configuration:
-  ```bash
-  drush config-import -y
-  ```
+
+Before running the import, you may need to set the site UUID so that configuration matches without errors. You can do this with the following command:
+
+```bash
+  drush cset system.site uuid "$(grep '^uuid:' config/sync/system.site.yml | awk '{print $2}')"
+```
+If for some reason the *grep command fails* to retrieve the configuration site UUID please do it manually:
+```bash
+  drush cset system.site uuid ${config/sync/system.site.yml SITE UUID}
+```
+Delete shortcuts to install without errors:
+```bash
+  drush entity:delete shortcut_set
+```
+Then finally import configs:
+```bash
+  drush cim -y
+```
 
 ## JSON:API Endpoints
 
