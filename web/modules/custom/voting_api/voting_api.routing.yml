@@ -17,3 +17,11 @@ entity.poll_question.collection:
     _permission: 'view poll_question entities'
   options:
     _admin_route: TRUE
+
+poll_question.vote_form:
+  path: '/poll/{poll_question}/vote'
+  defaults:
+    _title: 'Vote'
+    _form: '\Drupal\voting_api\Form\PollVoteForm'
+  requirements:
+    _entity_access: 'poll_question.view'

@@ -32,7 +32,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     }
  *   },
  *   links = {
- *     "canonical"  = "/admin/content/poll_question/{poll_question}",
+ *     "canonical"  = "/poll_question/{poll_question}",
  *     "collection" = "/admin/content/poll_question",
  *     "add-form"   = "/admin/content/poll_question/add",
  *     "edit-form"  = "/admin/content/poll_question/{poll_question}/edit",

@@ -4,6 +4,8 @@ namespace Drupal\voting_api;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityListBuilder;
+use Drupal\Core\Link;
+use Drupal\Core\Url;
 
 /**
  * Defines a list builder for PollQuestion entities.
@@ -25,7 +27,12 @@ class PollQuestionListBuilder extends EntityListBuilder {
    */
   public function buildRow(EntityInterface $entity) {
     /** @var \Drupal\voting_api\Entity\PollQuestion $entity */
-    $row['title'] = $entity->label();
+    // Link the title to the entity's canonical view page.
+    $row['title'] = Link::createFromRoute(
+      $entity->label(),
+      'entity.poll_question.canonical',
+      ['poll_question' => $entity->id()]
+    );
     $row['total_votes'] = $entity->get('total_votes')->value;
 
     // Decode stored option counts and percentages.

@@ -1,5 +1,6 @@
 <?php
 
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\voting_api\Entity\PollQuestion;
 
@@ -31,6 +32,91 @@ function voting_api_poll_question_delete(\Drupal\Core\Entity\EntityInterface $qu
   foreach ($votes as $vote) {
     $vote->delete();
   }
+}
+
+/**
+ * Implements hook_entity_view() for poll_question.
+ *
+ * Injects vote statistics and gauges into the full view of PollQuestion.
+ */
+function voting_api_entity_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode) {
+  // Only add statistics if show_results is TRUE.
+  if ($entity instanceof PollQuestion && $view_mode === 'full' && $entity->get('show_results')->value) {
+    // Decode stored counts and percentages.
+    $counts = json_decode($entity->get('option_counts')->value, TRUE);
+    $total = $entity->get('total_votes')->value;
+    $stats_data = [];
+    foreach ($entity->get('options') as $item) {
+      $uuid = $item->uuid;
+      $count = $counts[$uuid] ?? 0;
+      $percent = $total ? round(($count / $total) * 100) : 0;
+      $stats_data[] = [
+        'name' => $item->title,
+        'percent' => $percent,
+      ];
+    }
+    // Render the stats using the existing Twig template.
+    $build['poll_question_stats'] = [
+      '#theme' => 'poll_question_stats',
+      '#items' => $stats_data,
+      '#weight' => 100,
+    ];
+  }
+  // Always add the vote form for PollQuestion in full view, regardless of show_results.
+  if ($entity instanceof PollQuestion && $view_mode === 'full') {
+    $build['vote_form'] = \Drupal::formBuilder()->getForm(
+      'Drupal\voting_api\Form\PollVoteForm',
+      $entity
+    );
+  }
+}
+
+/**
+ * Implements hook_entity_view_alter().
+ *
+ * Remove raw option_counts and option_percentages fields from the render output.
+ */
+function voting_api_entity_view_alter(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display) {
+  if ($entity->getEntityTypeId() === 'poll_question' && $display->getMode() === 'full') {
+    // Remove raw internal fields and the options field wrapper.
+    foreach (['option_counts', 'option_percentages', 'options'] as $field) {
+      if (isset($build[$field])) {
+        unset($build[$field]);
+      }
+    }
+    // Unset total votes based on show_results bool.
+    if (!$entity->get('show_results')->value) {
+      unset($build['total_votes']);
+    }
+  }
+}
+
+/**
+ * Implements hook_entity_presave().
+ *
+ * Ensures each option item in a PollQuestion has a UUID when saving.
+ */
+function voting_api_entity_presave(EntityInterface $entity) {
+  if ($entity->getEntityTypeId() === 'poll_question') {
+    foreach ($entity->get('options') as $delta => $item) {
+      if (empty($item->uuid)) {
+        $entity->get('options')[$delta]->uuid = \Drupal::service('uuid')->generate();
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function voting_api_theme($existing, $type, $theme, $path) {
+  return [
+    'poll_question_stats' => [
+      'variables' => ['items' => NULL],
+      'template' => 'poll-question-stats',
+      'path' => $path . '/templates',
+    ],
+  ];
 }
 
 /**
@@ -72,19 +158,4 @@ function _voting_api_update_question_stats(PollQuestion $question) {
   $question->set('option_counts', json_encode($results));
   $question->set('option_percentages', json_encode($percentages));
   $question->save();
-}
-
-/**
- * Implements hook_entity_presave().
- *
- * Ensures each option item in a PollQuestion has a UUID when saving.
- */
-function voting_api_entity_presave(EntityInterface $entity) {
-  if ($entity->getEntityTypeId() === 'poll_question') {
-    foreach ($entity->get('options') as $delta => $item) {
-      if (empty($item->uuid)) {
-        $entity->get('options')[$delta]->uuid = \Drupal::service('uuid')->generate();
-      }
-    }
-  }
 }
